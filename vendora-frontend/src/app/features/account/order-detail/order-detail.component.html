@@ -1,0 +1,60 @@
+@if (loading()) {
+  <app-loading-spinner [full]="true"></app-loading-spinner>
+} @else if (!order()) {
+  <app-empty-state icon="😕" title="Order not found">
+    <a routerLink="/shop/orders" class="btn-primary mt-4 inline-block">Back to Orders</a>
+  </app-empty-state>
+} @else {
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <div class="flex items-center gap-3 mb-2">
+      <a routerLink="/shop/orders" class="text-gray-500 hover:text-brand-600">←</a>
+      <h1 class="text-xl font-bold text-gray-800">{{ shortId(order()!._id) }}</h1>
+      <span class="badge ml-auto" [ngClass]="statusColor(order()!.status)">{{ order()!.status }}</span>
+    </div>
+    <p class="text-sm text-gray-400 mb-6">{{ order()!.createdAt | date: 'MMM d, y, h:mm a' }}</p>
+
+    <div class="card p-5 mb-4">
+      <h2 class="font-bold text-gray-800 mb-3">Items</h2>
+      <div class="space-y-3">
+        @for (item of order()!.products; track item._id) {
+          <div class="flex items-center gap-3">
+            <img [src]="imageUrl(product(item).image)" class="h-12 w-12 rounded-lg object-cover bg-gray-50" alt="" />
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-gray-800 truncate">{{ product(item).name }}</p>
+              <p class="text-xs text-gray-400">x{{ item.quantity }}</p>
+            </div>
+            <p class="text-sm font-bold text-gray-700">EGP {{ product(item).price * item.quantity }}</p>
+          </div>
+        }
+      </div>
+
+      <hr class="border-gray-100 my-4" />
+
+      <div class="flex justify-between text-sm text-gray-500 mb-2">
+        <span>Subtotal</span>
+        <span class="text-gray-700 font-medium">EGP {{ subtotal }}</span>
+      </div>
+      <div class="flex justify-between text-sm text-gray-500 mb-2">
+        <span>Delivery Fee</span>
+        <span class="text-gray-700 font-medium">EGP {{ deliveryFee }}</span>
+      </div>
+      <div class="flex justify-between font-bold text-gray-800 mt-2">
+        <span>Total</span>
+        <span class="text-brand-700">EGP {{ order()!.totalPrice }}</span>
+      </div>
+    </div>
+
+    <div class="card p-5 mb-4">
+      <h2 class="font-bold text-gray-800 mb-3">Payment</h2>
+      <p class="text-sm text-gray-500">
+        {{ order()!.paymentMethod === 'Cash' ? '💵 Cash on Delivery' : '💳 Card Payment' }}
+      </p>
+    </div>
+
+    @if (order()!.status === 'Pending' || order()!.status === 'Processing') {
+      <button (click)="cancelOrder()" class="btn-outline !border-rose-400 !text-rose-500 hover:!bg-rose-50 w-full">
+        Cancel Order
+      </button>
+    }
+  </div>
+}

@@ -1,0 +1,70 @@
+<div>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-lg font-bold text-gray-800">Categories</h1>
+    <button (click)="openAdd()" class="btn-primary !px-5 !py-2.5 text-sm">+ Add Category</button>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+      @if (loading()) {
+        <app-loading-spinner [full]="true"></app-loading-spinner>
+      } @else if (categories().length === 0) {
+        <app-empty-state icon="🗂️" title="No categories yet"></app-empty-state>
+      } @else {
+        <div class="card overflow-hidden">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+              <tr>
+                <th class="text-left font-semibold px-4 py-3">Name</th>
+                <th class="text-left font-semibold px-4 py-3 hidden sm:table-cell">Description</th>
+                <th class="text-right font-semibold px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              @for (cat of categories(); track cat._id) {
+                <tr class="hover:bg-gray-50">
+                  <td class="px-4 py-3 font-medium text-gray-800 capitalize">{{ cat.name }}</td>
+                  <td class="px-4 py-3 text-gray-500 truncate max-w-xs hidden sm:table-cell">{{ cat.description || '—' }}</td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center justify-end gap-3 text-xs font-semibold">
+                      <button (click)="openEdit(cat)" class="text-brand-600 hover:underline">Edit</button>
+                      <button (click)="remove(cat)" class="text-rose-500 hover:underline">Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    @if (showForm()) {
+      <div class="card p-5 h-fit">
+        <h2 class="font-bold text-gray-800 mb-4">{{ editingId() ? 'Edit Category' : 'New Category' }}</h2>
+        <form [formGroup]="form" (ngSubmit)="save()" class="space-y-3">
+          <div>
+            <label class="text-xs font-medium text-gray-500">Name</label>
+            <input formControlName="name" class="input-field mt-1" placeholder="Candles" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-500">Description (optional)</label>
+            <textarea formControlName="description" rows="3" class="input-field mt-1 resize-none" placeholder="Handmade scented candles"></textarea>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-500">Image URL (optional)</label>
+            <input formControlName="image" class="input-field mt-1" placeholder="https://..." />
+          </div>
+          <div class="flex gap-3 pt-1">
+            <button type="button" (click)="showForm.set(false)" class="flex-1 rounded-xl border border-gray-200 py-2.5 font-semibold text-gray-600 hover:bg-gray-50">
+              Cancel
+            </button>
+            <button type="submit" [disabled]="saving()" class="btn-primary flex-1">
+              {{ saving() ? 'Saving...' : 'Save' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+</div>

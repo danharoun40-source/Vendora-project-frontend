@@ -1,0 +1,43 @@
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">My Wishlist</h1>
+
+  @if (loading()) {
+    <app-loading-spinner [full]="true"></app-loading-spinner>
+  } @else if (products().length === 0) {
+    <app-empty-state icon="♡" title="Your wishlist is empty" subtitle="Save products you love to find them here later.">
+      <a routerLink="/shop" class="btn-primary mt-4 inline-block">Explore Products</a>
+    </app-empty-state>
+  } @else {
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+      @for (product of products(); track product._id) {
+        <div class="card overflow-hidden group relative">
+          <a [routerLink]="['/shop/products', product._id]" class="block relative aspect-square bg-gray-50 overflow-hidden">
+            <img [src]="imageUrl(product.image)" [alt]="product.name" class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          </a>
+          <button
+            (click)="remove(product)"
+            class="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/90 flex items-center justify-center shadow text-rose-500"
+          >
+            ♥
+          </button>
+          <div class="p-3">
+            <a [routerLink]="['/shop/products', product._id]">
+              <p class="text-sm font-semibold text-gray-800 truncate">{{ product.name }}</p>
+              <app-star-rating [rating]="product.averageRating || 0" [count]="product.reviewsCount || 0"></app-star-rating>
+            </a>
+            <div class="flex items-center justify-between mt-2">
+              <span class="font-bold text-brand-700">EGP {{ product.price }}</span>
+              <button
+                (click)="addToCart(product)"
+                [disabled]="product.stock === 0"
+                class="h-8 w-8 rounded-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-300 text-white flex items-center justify-center text-sm"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,51 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">
+    My Cart @if (cart() && cart()!.products.length) { ({{ cart()!.products.length }}) }
+  </h1>
+
+  @if (loading()) {
+    <app-loading-spinner [full]="true"></app-loading-spinner>
+  } @else if (!cart() || cart()!.products.length === 0) {
+    <app-empty-state icon="🛒" title="Your cart is empty" subtitle="Looks like you haven't added anything yet.">
+      <a routerLink="/shop" class="btn-primary mt-4 inline-block">Start Shopping</a>
+    </app-empty-state>
+  } @else {
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-3">
+        @for (item of cart()!.products; track item._id) {
+          <div class="card p-4 flex items-center gap-4">
+            <img [src]="imageUrl(productOf(item).image)" class="h-16 w-16 rounded-xl object-cover bg-gray-50" alt="" />
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-gray-800 text-sm truncate">{{ productOf(item).name }}</p>
+              <p class="text-brand-700 font-bold text-sm mt-1">EGP {{ productOf(item).price }}</p>
+            </div>
+            <div class="flex items-center gap-3 border border-gray-200 rounded-lg px-2 py-1">
+              <button (click)="updateQuantity(item, -1)" class="text-gray-500 font-bold w-5">−</button>
+              <span class="text-sm font-semibold w-5 text-center">{{ item.quantity }}</span>
+              <button (click)="updateQuantity(item, 1)" class="text-gray-500 font-bold w-5">+</button>
+            </div>
+            <button (click)="removeItem(item)" class="text-gray-400 hover:text-rose-500 text-lg px-1">🗑️</button>
+          </div>
+        }
+      </div>
+
+      <div class="card p-5 h-fit">
+        <h2 class="font-bold text-gray-800 mb-4">Order Summary</h2>
+        <div class="flex justify-between text-sm text-gray-500 mb-2">
+          <span>Subtotal</span>
+          <span class="text-gray-700 font-medium">EGP {{ subtotal() }}</span>
+        </div>
+        <div class="flex justify-between text-sm text-gray-500 mb-3">
+          <span>Delivery Fee</span>
+          <span class="text-gray-700 font-medium">EGP {{ deliveryFee }}</span>
+        </div>
+        <hr class="border-gray-100 mb-3" />
+        <div class="flex justify-between font-bold text-gray-800 mb-5">
+          <span>Total</span>
+          <span class="text-brand-700">EGP {{ total() }}</span>
+        </div>
+        <button (click)="goToCheckout()" class="btn-primary w-full">Checkout</button>
+      </div>
+    </div>
+  }
+</div>

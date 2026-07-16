@@ -1,0 +1,131 @@
+<div class="min-h-screen flex flex-col bg-[#f7f6fb]">
+  <header class="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
+      <button class="lg:hidden text-2xl text-gray-500" (click)="menuOpen = !menuOpen">☰</button>
+
+      <a routerLink="/shop" class="flex items-center gap-2 shrink-0">
+        <span class="h-9 w-9 rounded-xl bg-brand-600 text-white flex items-center justify-center text-lg">🛍️</span>
+        <span class="text-xl font-extrabold text-navy-900">Vendora</span>
+      </a>
+
+      <div class="hidden md:flex flex-1 max-w-xl mx-4">
+        <div class="relative w-full">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+            placeholder="Search handmade products..."
+            class="w-full rounded-full border border-gray-200 bg-gray-50 pl-4 pr-11 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          />
+          <button (click)="onSearch()" class="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-brand-600 text-white flex items-center justify-center">
+            🔍
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 ml-auto">
+        <a routerLink="/shop/wishlist" class="hidden sm:flex h-10 w-10 rounded-full items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-brand-600">
+          ♡
+        </a>
+
+        <a routerLink="/shop/cart" class="relative h-10 w-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-brand-600">
+          🛒
+          @if (cartService.itemCount() > 0) {
+            <span class="absolute -top-1 -right-1 h-5 min-w-5 px-1 rounded-full bg-brand-600 text-white text-[11px] font-bold flex items-center justify-center">
+              {{ cartService.itemCount() }}
+            </span>
+          }
+        </a>
+
+        @if (auth.isLoggedIn()) {
+          <div class="relative">
+            <button (click)="toggleAccountMenu($event)" class="flex items-center gap-2 rounded-full pl-1 pr-3 py-1 hover:bg-gray-50">
+              <span class="h-8 w-8 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-sm">
+                {{ auth.currentUser()?.firstName?.charAt(0) }}{{ auth.currentUser()?.lastName?.charAt(0) }}
+              </span>
+              <span class="hidden sm:block text-sm font-semibold text-gray-700">{{ auth.currentUser()?.firstName }}</span>
+            </button>
+
+            @if (accountMenuOpen) {
+              <div (click)="$event.stopPropagation()" class="absolute right-0 mt-2 w-56 card p-2 text-sm">
+                @if (auth.role() === 'admin') {
+                  <a routerLink="/admin/dashboard" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-50 text-gray-700">📊 Admin Dashboard</a>
+                }
+                @if (auth.role() === 'seller') {
+                  <a routerLink="/seller/products" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-50 text-gray-700">🏪 Seller Dashboard</a>
+                }
+                <a routerLink="/shop/orders" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-50 text-gray-700">📦 My Orders</a>
+                <a routerLink="/shop/wishlist" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-50 text-gray-700">♡ Wishlist</a>
+                <a routerLink="/shop/addresses" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-50 text-gray-700">📍 Addresses</a>
+                <a routerLink="/shop/profile" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-50 text-gray-700">👤 Profile</a>
+                <hr class="my-1 border-gray-100" />
+                <button (click)="logout()" class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-rose-50 text-rose-500 font-semibold">
+                  ⏻ Logout
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <a routerLink="/auth/login" class="btn-outline !px-4 !py-2 text-sm">Login</a>
+          <a routerLink="/auth/register" class="btn-primary !px-4 !py-2 text-sm hidden sm:inline-flex">Sign Up</a>
+        }
+      </div>
+    </div>
+
+    <div class="md:hidden px-4 pb-3">
+      <div class="relative w-full">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+          placeholder="Search handmade products..."
+          class="w-full rounded-full border border-gray-200 bg-gray-50 pl-4 pr-11 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+        />
+        <button (click)="onSearch()" class="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-brand-600 text-white flex items-center justify-center">
+          🔍
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="bg-navy-900 text-white/70 mt-12">
+    <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+      <div class="col-span-2 md:col-span-1">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="h-8 w-8 rounded-lg bg-brand-600 text-white flex items-center justify-center">🛍️</span>
+          <span class="text-lg font-bold text-white">Vendora</span>
+        </div>
+        <p class="text-white/50">Manage. Sell. Grow. A marketplace for handmade goods, made with love.</p>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3">Shop</h4>
+        <ul class="space-y-2 text-white/50">
+          <li><a routerLink="/shop" class="hover:text-white">All Products</a></li>
+          <li><a routerLink="/shop/wishlist" class="hover:text-white">Wishlist</a></li>
+          <li><a routerLink="/shop/cart" class="hover:text-white">Cart</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3">Account</h4>
+        <ul class="space-y-2 text-white/50">
+          <li><a routerLink="/shop/orders" class="hover:text-white">My Orders</a></li>
+          <li><a routerLink="/shop/addresses" class="hover:text-white">Addresses</a></li>
+          <li><a routerLink="/shop/profile" class="hover:text-white">Profile</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3">Sell on Vendora</h4>
+        <ul class="space-y-2 text-white/50">
+          <li><a routerLink="/auth/register" class="hover:text-white">Become a Seller</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10 py-4 text-center text-xs text-white/40">
+      © 2026 Vendora. All rights reserved.
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,63 @@
+<div>
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <h1 class="text-lg font-bold text-gray-800">All Products</h1>
+    <div class="flex gap-3 w-full sm:w-auto">
+      <input
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        placeholder="Search products..."
+        class="input-field flex-1 sm:w-64"
+      />
+      <a routerLink="/admin/products/new" class="btn-primary !px-5 !py-2.5 text-sm whitespace-nowrap">+ Add</a>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner [full]="true"></app-loading-spinner>
+  } @else if (filtered.length === 0) {
+    <app-empty-state icon="🧺" title="No products found"></app-empty-state>
+  } @else {
+    <div class="card overflow-x-auto">
+      <table class="w-full text-sm min-w-[640px]">
+        <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+          <tr>
+            <th class="text-left font-semibold px-4 py-3">Product</th>
+            <th class="text-left font-semibold px-4 py-3">Category</th>
+            <th class="text-left font-semibold px-4 py-3">Price</th>
+            <th class="text-left font-semibold px-4 py-3">Stock</th>
+            <th class="text-left font-semibold px-4 py-3">Rating</th>
+            <th class="text-right font-semibold px-4 py-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (product of filtered; track product._id) {
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <img [src]="imageUrl(product.image)" class="h-10 w-10 rounded-lg object-cover bg-gray-50" alt="" />
+                  <span class="font-medium text-gray-800 truncate max-w-[10rem]">{{ product.name }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-gray-500 capitalize">{{ product.category }}</td>
+              <td class="px-4 py-3 font-semibold text-brand-700">EGP {{ product.price }}</td>
+              <td class="px-4 py-3">
+                @if (product.stock > 0) {
+                  <span class="badge bg-emerald-50 text-emerald-700">{{ product.stock }}</span>
+                } @else {
+                  <span class="badge bg-rose-50 text-rose-600">0</span>
+                }
+              </td>
+              <td class="px-4 py-3 text-gray-500">★ {{ (product.averageRating || 0).toFixed(1) }}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-end gap-3 text-xs font-semibold">
+                  <a [routerLink]="['/admin/products', product._id, 'edit']" class="text-brand-600 hover:underline">Edit</a>
+                  <button (click)="delete(product)" class="text-rose-500 hover:underline">Delete</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

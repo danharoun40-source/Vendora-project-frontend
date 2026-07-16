@@ -1,0 +1,133 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+  <div class="flex items-center gap-3 mb-6">
+    <a routerLink="/shop/cart" class="text-gray-500 hover:text-brand-600">←</a>
+    <h1 class="text-2xl font-bold text-gray-800">Checkout</h1>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner [full]="true"></app-loading-spinner>
+  } @else {
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Shipping -->
+        <div class="card p-5">
+          <h2 class="font-bold text-gray-800 mb-4">Shipping Information</h2>
+
+          @if (addresses().length > 0) {
+            <div class="space-y-3 mb-4">
+              @for (addr of addresses(); track addr._id) {
+                <label
+                  class="flex items-start gap-3 rounded-xl border-2 p-3 cursor-pointer transition"
+                  [class.border-brand-600]="selectedAddressId() === addr._id"
+                  [class.bg-brand-50]="selectedAddressId() === addr._id"
+                  [class.border-gray-200]="selectedAddressId() !== addr._id"
+                >
+                  <input
+                    type="radio"
+                    name="address"
+                    class="mt-1"
+                    [checked]="selectedAddressId() === addr._id"
+                    (change)="selectAddress(addr._id)"
+                  />
+                  <div class="text-sm">
+                    <p class="font-semibold text-gray-800">{{ addr.fullName }} · {{ addr.phone }}</p>
+                    <p class="text-gray-500 mt-0.5">
+                      {{ addr.building }}, {{ addr.street }}, {{ addr.city }}
+                      @if (addr.apartment) { , Apt {{ addr.apartment }} }
+                    </p>
+                  </div>
+                </label>
+              }
+            </div>
+            <button (click)="showNewAddressForm.set(!showNewAddressForm())" class="text-brand-600 text-sm font-semibold">
+              {{ showNewAddressForm() ? '− Cancel' : '+ Add a new address' }}
+            </button>
+          }
+
+          @if (showNewAddressForm() || addresses().length === 0) {
+            <form [formGroup]="addressForm" (ngSubmit)="saveNewAddress()" class="mt-4 space-y-3">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-xs font-medium text-gray-500">Full Name</label>
+                  <input formControlName="fullName" class="input-field mt-1" placeholder="Sara Ahmed" />
+                </div>
+                <div>
+                  <label class="text-xs font-medium text-gray-500">Phone Number</label>
+                  <input formControlName="phone" class="input-field mt-1" placeholder="01012345678" />
+                </div>
+              </div>
+              <div>
+                <label class="text-xs font-medium text-gray-500">City</label>
+                <input formControlName="city" class="input-field mt-1" placeholder="Cairo" />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-xs font-medium text-gray-500">Street</label>
+                  <input formControlName="street" class="input-field mt-1" placeholder="El Nozha Street" />
+                </div>
+                <div>
+                  <label class="text-xs font-medium text-gray-500">Building</label>
+                  <input formControlName="building" class="input-field mt-1" placeholder="123" />
+                </div>
+              </div>
+              <div>
+                <label class="text-xs font-medium text-gray-500">Apartment (optional)</label>
+                <input formControlName="apartment" class="input-field mt-1" placeholder="Apt 4" />
+              </div>
+              <button type="button" (click)="saveNewAddress()" class="btn-outline w-full !py-2.5 text-sm">Save Address</button>
+            </form>
+          }
+        </div>
+
+        <!-- Payment -->
+        <div class="card p-5">
+          <h2 class="font-bold text-gray-800 mb-4">Payment Method</h2>
+          <div class="space-y-3">
+            <label
+              class="flex items-center gap-3 rounded-xl border-2 p-3 cursor-pointer transition"
+              [class.border-brand-600]="paymentMethod() === 'Cash'"
+              [class.bg-brand-50]="paymentMethod() === 'Cash'"
+              [class.border-gray-200]="paymentMethod() !== 'Cash'"
+            >
+              <input type="radio" name="payment" [checked]="paymentMethod() === 'Cash'" (change)="paymentMethod.set('Cash')" />
+              <span class="text-sm font-semibold text-gray-700">💵 Cash on Delivery</span>
+            </label>
+            <label
+              class="flex items-center gap-3 rounded-xl border-2 p-3 cursor-not-allowed opacity-60"
+            >
+              <input type="radio" name="payment" disabled />
+              <span class="text-sm font-semibold text-gray-500">💳 Card Payment (coming soon)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="card p-5 h-fit">
+        <h2 class="font-bold text-gray-800 mb-4">Order Summary</h2>
+        @for (item of cart()?.products; track item._id) {
+          <div class="flex justify-between text-sm text-gray-500 mb-2">
+            <span class="truncate pr-2">{{ $any(item.product)?.name }} × {{ item.quantity }}</span>
+          </div>
+        }
+        <hr class="border-gray-100 my-3" />
+        <div class="flex justify-between text-sm text-gray-500 mb-2">
+          <span>Subtotal</span>
+          <span class="text-gray-700 font-medium">EGP {{ subtotal() }}</span>
+        </div>
+        <div class="flex justify-between text-sm text-gray-500 mb-3">
+          <span>Delivery Fee</span>
+          <span class="text-gray-700 font-medium">EGP {{ deliveryFee }}</span>
+        </div>
+        <hr class="border-gray-100 mb-3" />
+        <div class="flex justify-between font-bold text-gray-800 mb-5">
+          <span>Total</span>
+          <span class="text-brand-700">EGP {{ total() }}</span>
+        </div>
+        <button (click)="placeOrder()" [disabled]="placingOrder()" class="btn-primary w-full">
+          {{ placingOrder() ? 'Placing order...' : 'Place Order · EGP ' + total() }}
+        </button>
+      </div>
+    </div>
+  }
+</div>

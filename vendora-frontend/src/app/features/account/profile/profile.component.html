@@ -1,0 +1,47 @@
+<div class="max-w-xl mx-auto px-4 sm:px-6 py-8">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">My Profile</h1>
+
+  <div class="card p-6">
+    <div class="flex items-center gap-4 mb-6">
+      <span class="h-16 w-16 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-2xl">
+        {{ auth.currentUser()?.firstName?.charAt(0) }}{{ auth.currentUser()?.lastName?.charAt(0) }}
+      </span>
+      <div>
+        <p class="text-lg font-bold text-gray-800">
+          {{ auth.currentUser()?.firstName }} {{ auth.currentUser()?.lastName }}
+        </p>
+        <span class="badge bg-brand-50 text-brand-700 capitalize mt-1">{{ auth.currentUser()?.role }}</span>
+      </div>
+    </div>
+
+    <div class="space-y-4 text-sm">
+      <div class="flex justify-between border-b border-gray-100 pb-3">
+        <span class="text-gray-400">Email</span>
+        <span class="font-medium text-gray-700">{{ auth.currentUser()?.email }}</span>
+      </div>
+      <div class="flex justify-between border-b border-gray-100 pb-3">
+        <span class="text-gray-400">Phone</span>
+        <span class="font-medium text-gray-700">{{ auth.currentUser()?.phone || '—' }}</span>
+      </div>
+      <div class="flex justify-between pb-1">
+        <span class="text-gray-400">Account Type</span>
+        <span class="font-medium text-gray-700 capitalize">{{ auth.currentUser()?.role }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3 mt-4">
+    <a routerLink="/shop/orders" class="card p-4 text-center hover:shadow-soft transition-shadow">
+      <p class="text-2xl mb-1">📦</p>
+      <p class="text-sm font-semibold text-gray-700">My Orders</p>
+    </a>
+    <a routerLink="/shop/addresses" class="card p-4 text-center hover:shadow-soft transition-shadow">
+      <p class="text-2xl mb-1">📍</p>
+      <p class="text-sm font-semibold text-gray-700">Addresses</p>
+    </a>
+  </div>
+
+  <button (click)="logout()" class="btn-outline !border-rose-400 !text-rose-500 hover:!bg-rose-50 w-full mt-6">
+    Logout
+  </button>
+</div>

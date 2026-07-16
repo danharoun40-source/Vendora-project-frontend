@@ -1,0 +1,10 @@
+<div class="flex items-center gap-1">
+  <div class="flex" [class.text-xs]="size === 'sm'" [class.text-base]="size === 'md'">
+    @for (s of stars; track s) {
+      <span [class.text-amber-400]="s <= rounded" [class.text-gray-300]="s > rounded">★</span>
+    }
+  </div>
+  @if (count !== undefined) {
+    <span class="text-xs text-gray-400">({{ count }})</span>
+  }
+</div>

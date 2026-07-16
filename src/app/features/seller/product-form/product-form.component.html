@@ -1,0 +1,95 @@
+<div class="max-w-2xl mx-auto">
+  <div class="flex items-center gap-3 mb-6">
+    <a [routerLink]="backPath" class="text-gray-500 hover:text-brand-600">←</a>
+    <h1 class="text-xl font-bold text-gray-800">{{ productId ? 'Edit Product' : 'Add New Product' }}</h1>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner [full]="true"></app-loading-spinner>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" class="card p-6 space-y-4">
+      <div>
+        <label class="text-sm font-medium text-gray-600 mb-1 block">Product Image</label>
+        <div class="flex items-center gap-4">
+          <div class="h-24 w-24 rounded-xl bg-gray-50 border border-dashed border-gray-300 overflow-hidden flex items-center justify-center shrink-0">
+            @if (imagePreview()) {
+              <img [src]="imagePreview()" class="h-full w-full object-cover" alt="" />
+            } @else {
+              <span class="text-3xl text-gray-300">🖼️</span>
+            }
+          </div>
+          @if (!productId) {
+            <label class="btn-outline !py-2.5 text-sm cursor-pointer">
+              Upload Image
+              <input type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)" />
+            </label>
+          } @else {
+            <p class="text-xs text-gray-400 max-w-[16rem]">
+              Image can only be set when the product is first created.
+            </p>
+          }
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-medium text-gray-600 mb-1 block">Product Name</label>
+        <input formControlName="name" class="input-field" placeholder="Scented Candle" />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <p class="text-xs text-rose-500 mt-1">Product name is required.</p>
+        }
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium text-gray-600 mb-1 block">Category</label>
+          <select formControlName="category" class="input-field">
+            <option value="" disabled>Select category</option>
+            @for (cat of categories(); track cat._id) {
+              <option [value]="cat.name">{{ cat.name | titlecase }}</option>
+            }
+          </select>
+          @if (form.controls.category.touched && form.controls.category.invalid) {
+            <p class="text-xs text-rose-500 mt-1">Category is required.</p>
+          }
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-600 mb-1 block">Price (EGP)</label>
+          <input formControlName="price" type="number" min="1" class="input-field" placeholder="100" />
+          @if (form.controls.price.touched && form.controls.price.invalid) {
+            <p class="text-xs text-rose-500 mt-1">Enter a valid price.</p>
+          }
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-medium text-gray-600 mb-1 block">Stock Quantity</label>
+        <input formControlName="stock" type="number" min="0" class="input-field" placeholder="12" />
+        @if (form.controls.stock.touched && form.controls.stock.invalid) {
+          <p class="text-xs text-rose-500 mt-1">Enter a valid stock quantity.</p>
+        }
+      </div>
+
+      <div>
+        <label class="text-sm font-medium text-gray-600 mb-1 block">Description</label>
+        <textarea
+          formControlName="description"
+          rows="4"
+          class="input-field resize-none"
+          placeholder="Handmade scented candle with natural ingredients."
+        ></textarea>
+        @if (form.controls.description.touched && form.controls.description.invalid) {
+          <p class="text-xs text-rose-500 mt-1">Description must be at least 10 characters.</p>
+        }
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <a [routerLink]="backPath" class="flex-1 rounded-xl border border-gray-200 py-3 font-semibold text-gray-600 hover:bg-gray-50 text-center">
+          Cancel
+        </a>
+        <button type="submit" [disabled]="saving()" class="btn-primary flex-1">
+          {{ saving() ? 'Saving...' : productId ? 'Save Changes' : 'Add Product' }}
+        </button>
+      </div>
+    </form>
+  }
+</div>
